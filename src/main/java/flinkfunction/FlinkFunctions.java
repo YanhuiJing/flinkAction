@@ -3,7 +3,10 @@ package flinkfunction;
 import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.collector.selector.OutputSelector;
 import org.apache.flink.util.Collector;
+
+import java.util.Arrays;
 
 /**
  * flink方法集
@@ -84,6 +87,17 @@ public class FlinkFunctions {
             a.count += b.count;
             b.sum += b.sum;
             return a;
+        }
+    }
+
+    // 数据流分流
+    public static class OutPutExample implements OutputSelector<String>{
+
+        @Override
+        public Iterable<String> select(String value) {
+
+            return value.equals("gavin") ? Arrays.asList("gavin") : Arrays.asList("other");
+
         }
     }
 

@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrderness
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
-import utils.WordCount;
+import utils.Words;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -80,13 +80,13 @@ public class DefineSource {
 
     public static class LineSource implements SourceFunction<String>{
 
-        private int lineLength = WordCount.WORDS.length;
+        private int lineLength = Words.WORDS.length;
         private volatile Boolean isRunning = true;
 
         @Override
         public void run(SourceContext<String> ctx) throws Exception {
             while(isRunning){
-                ctx.collect(WordCount.WORDS[new Random().nextInt(lineLength)]);
+                ctx.collect(Words.WORDS[new Random().nextInt(lineLength)]);
                 Thread.sleep(1000);
             }
 
@@ -105,7 +105,7 @@ public class DefineSource {
      */
     public static class EventTimeSource implements SourceFunction<Tuple2<String,Long>>{
 
-        private int lineLength = WordCount.WORDS.length;
+        private int lineLength = Words.WORDS.length;
         private Boolean isRunning = true;
 
         @Override
@@ -113,7 +113,7 @@ public class DefineSource {
 
             while(isRunning){
                 long currentTime = System.currentTimeMillis();
-                ctx.collect(new Tuple2<>(WordCount.WORDS[new Random().nextInt(lineLength)],currentTime));
+                ctx.collect(new Tuple2<>(Words.WORDS[new Random().nextInt(lineLength)],currentTime));
                 Thread.sleep(1000);
             }
 

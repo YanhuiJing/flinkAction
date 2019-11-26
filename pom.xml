@@ -32,6 +32,12 @@
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!--flink-kafka-connector-->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka-0.11_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
 
 
         <!-- Add logging framework, to produce console output when running in the IDE. -->
@@ -55,6 +61,13 @@
             <version>1.2.21</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -62,7 +75,6 @@
         <!--添加profiles,程序运行调试的过程中,可以使用flink相关jar包,但是打jar包不会引入-->
         <profile>
             <id>add-dependencies-for-IDEA</id>
-
             <activation>
                 <property>
                     <name>idea.version</name>
@@ -89,13 +101,16 @@
     <build>
         <plugins>
             <!-- Java Compiler -->
+            <!--https://www.xinke.org.cn/article/detail/775 解决编译不通过链接-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <fork>true</fork>
+                    <executable>
+                        C:\Program Files\Java\jdk1.8.0_45\bin\javac.exe
+                    </executable>
                 </configuration>
             </plugin>
 

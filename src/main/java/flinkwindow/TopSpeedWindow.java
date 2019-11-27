@@ -1,4 +1,4 @@
-package flinkexample;
+package flinkwindow;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple4;

@@ -104,7 +104,6 @@ public class FlinkFunctions {
 
 }
 
-
 class AverageAccumulator {
     public long count;
     public long sum;

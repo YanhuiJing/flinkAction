@@ -48,6 +48,33 @@ import java.util.Optional;
  *           Iterable<UV> values() throws Exception;
  *           Iterator<Map.Entry<UK, UV>> iterator() throws Exception;
  *
+ * abstract class StateDescriptor<S extends State, T> implements Serializable
+ *      ValueStateDescriptor<T> extends StateDescriptor<ValueState<T>, T>
+ *      ListStateDescriptor<T> extends StateDescriptor<ListState<T>, List<T>>
+ *      MapStateDescriptor<UK, UV> extends StateDescriptor<MapState<UK, UV>, Map<UK, UV>>
+ *      ReducingStateDescriptor<T> extends StateDescriptor<ReducingState<T>, T>
+ *      AggregatingStateDescriptor<IN, ACC, OUT> extends StateDescriptor<AggregatingState<IN, OUT>, ACC>
+ *
+ *      protected final String name;
+ *      private TypeInformation<T> typeInfo;
+ *      private StateTtlConfig ttlConfig = StateTtlConfig.DISABLED;
+ *
+ * abstract class TypeInformation<T> implements Serializable
+ *      public static <T> TypeInformation<T> of(TypeHint<T> typeHint) {
+            return typeHint.getTypeInfo();
+        }
+
+  class StateTtlConfig implements Serializable
+        状态过期参数设置
+        private final UpdateType updateType;
+        private final StateVisibility stateVisibility;
+        private final TtlTimeCharacteristic ttlTimeCharacteristic;
+        private final Time ttl;
+        private final CleanupStrategies cleanupStrategies;
+ *
+ *
+ *
+ *
  */
 public class TestKeyedState {
     public static void main(String[] args) throws Exception{

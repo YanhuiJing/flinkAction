@@ -62,6 +62,30 @@ import java.util.Arrays;
             this.environment = Preconditions.checkNotNull(environment, "Execution Environment must not be null.");
             this.transformation = Preconditions.checkNotNull(transformation, "Stream Transformation must not be null.");
         }
+ class StreamingJobGraphGenerator
+    // 判断两个StreamNode是否能chain在一起
+    public static boolean isChainable(StreamEdge edge, StreamGraph streamGraph) {
+        StreamNode upStreamVertex = streamGraph.getSourceVertex(edge);
+        StreamNode downStreamVertex = streamGraph.getTargetVertex(edge);
+
+        StreamOperatorFactory<?> headOperator = upStreamVertex.getOperatorFactory();
+        StreamOperatorFactory<?> outOperator = downStreamVertex.getOperatorFactory();
+
+        下游Edges的长度为1 ||  上下游操作不为空  ||  上下游算子的共享槽相同  || 下游的chain策略是always而上游的策略是always或者head
+        edge的shuffle模式不是BATCH模式  ||  上下游的并行度数量相等  ||  streamGraph是可连接的
+        return downStreamVertex.getInEdges().size() == 1
+            && outOperator != null
+            && headOperator != null
+            && upStreamVertex.isSameSlotSharingGroup(downStreamVertex)
+            && outOperator.getChainingStrategy() == ChainingStrategy.ALWAYS
+            && (headOperator.getChainingStrategy() == ChainingStrategy.HEAD ||
+            headOperator.getChainingStrategy() == ChainingStrategy.ALWAYS)
+            && (edge.getPartitioner() instanceof ForwardPartitioner)
+            && edge.getShuffleMode() != ShuffleMode.BATCH
+            && upStreamVertex.getParallelism() == downStreamVertex.getParallelism()
+            && streamGraph.isChainingEnabled();
+    }
+
  *
  *
  */

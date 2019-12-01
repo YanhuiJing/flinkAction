@@ -1,4 +1,6 @@
-http://shiyanjun.cn/archives/1508.html
+http://shiyanjun.cn/archives/1508.html => Apache Flink：特性、概念、组件栈、架构及原理分析
+https://zhuanlan.zhihu.com/p/22736103 => Flink源码解析-从API到JobGraph
+https://www.jianshu.com/nb/28030243 => 丹之的flink专栏
 Window
     Window就是用来对一个无限的流设置一个有限的集合,在有界的数据集上进行操作的一种机制
 

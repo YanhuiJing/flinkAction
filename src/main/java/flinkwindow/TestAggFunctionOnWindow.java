@@ -55,7 +55,7 @@ public class TestAggFunctionOnWindow {
 
 
         /**
-         * 将元素添加到累加器并返回新的累加器
+         * 将元素添加到累加器并返回新的累加器,单个类加起计算
 
          * @return
          */

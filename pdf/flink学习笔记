@@ -1,13 +1,49 @@
 http://shiyanjun.cn/archives/1508.html => Apache Flink：特性、概念、组件栈、架构及原理分析
 https://zhuanlan.zhihu.com/p/22736103 => Flink源码解析-从API到JobGraph
 https://www.jianshu.com/nb/28030243 => 丹之的flink专栏
+
+JobManager:
+    安排任务,管理checkpoint,故障恢复
+    Actor System(通信),
+    Schedulerd(任务及资源调度),
+    Checkpointing(任务缓存及恢复)
+
+
+TaskManager的一个solt代表一个可用线程,该线程具有固定的内存,注意solt只对内存进行隔离，
+   没有对cpu隔离。默认情况下,flink允许子任务共享solt,即使它们是不同task的subtask,
+   只要它们来自相同的job。这种共享可以有更好的资源利用率
+
+四大特性:
+    state,checkpoint,time,window
+
+Time:
+    ProcessingTime,EventTime,Ingestion Time
+
 Window
     Window就是用来对一个无限的流设置一个有限的集合,在有界的数据集上进行操作的一种机制
+
+    按照窗口滑动类型分类
+            tumbling window => 滚动窗口
+            sliding window => 滑动窗口
 
     Flink在KeyedStream中提供了下面集中window
         以时间驱动的TimeWindow
         以事件数量驱动的CountWindow
         以会话间隔驱动的SessionWindow
+
+    WindowAssigner(窗口创建及窗口元素分配):
+        到达窗口操作符的元素被传递给 WindowAssigner。
+        WindowAssigner 将元素分配给一个或多个窗口，可能会创建新的窗口。
+
+    WindowTrigger(窗口计算逻辑触发):
+        Trigger 表示触发器，每个窗口都拥有一个 Trigger（触发器），该 Trigger 决定何时计算和清除窗口。
+        当先前注册的计时器超时时，将为插入窗口的每个元素调用触发器。在每个事件上，触发器都可以决定触发，
+        即清除（删除窗口并丢弃其内容），或者启动并清除窗口。一个窗口可以被求值多次，并且在被清除之前一直存在。
+        注意，在清除窗口之前，窗口将一直消耗内存。
+
+    WindowEvictor(窗口元素清除):
+        Evictor 表示驱逐者，它可以遍历窗口元素列表，并可以决定从列表的开头删除首先进入窗口的一些元素，
+        然后其余的元素被赋给一个计算函数，如果没有定义 Evictor，触发器直接将所有窗口元素交给计算函数。
 
 Source:数据源,Flink在流处理和批处理上的source大概有四类:
     基于本地集合的Source,基于文件的Source,基于网络套接字的Source,自定义的Source

@@ -27,7 +27,9 @@ public class SideOutputExample {
      * We need to create an {@link OutputTag} so that we can reference it when emitting
      * data to a side output and also to retrieve the side output stream from an operation.
      */
-    private static final OutputTag<String> rejectedWordsTag = new OutputTag<String>("rejected") {};
+    private static final OutputTag<String> rejected3Tag = new OutputTag<String>("rejected-3") {};
+    private static final OutputTag<String> rejected5Tag = new OutputTag<String>("rejected-5") {};
+    private static final OutputTag<String> rejected7Tag = new OutputTag<String>("rejected-7") {};
 
     public static void main(String[] args) throws Exception {
 
@@ -50,26 +52,47 @@ public class SideOutputExample {
                 })
                 .process(new Tokenizer());
 
-        DataStream<String> rejectedWords = tokenized
-                .getSideOutput(rejectedWordsTag)
+        DataStream<String> rejected3Words = tokenized
+                .getSideOutput(rejected3Tag)
                 .map(new MapFunction<String, String>() {
                     private static final long serialVersionUID = 1L;
 
                     @Override
                     public String map(String value) throws Exception {
-                        return "rejected: " + value;
+                        return "3: " + value;
                     }
                 });
 
-        DataStream<Tuple2<String, Integer>> counts = tokenized
-                .keyBy(0)
-                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
-                // group by the tuple field "0" and sum up tuple field "1"
-                .sum(1);
+        SingleOutputStreamOperator<String> rejected5Words = tokenized.getSideOutput(rejected5Tag)
+                .map(new MapFunction<String, String>() {
+                    @Override
+                    public String map(String value) throws Exception {
+                        return "5: " + value;
+                    }
+                });
+
+        SingleOutputStreamOperator<String> rejected7Words = tokenized.getSideOutput(rejected7Tag)
+                .map(new MapFunction<String, String>() {
+                    @Override
+                    public String map(String value) throws Exception {
+                        return "7: " + value;
+                    }
+                });
+
+//        DataStream<Tuple2<String, Integer>> counts = tokenized
+//                .keyBy(0)
+//                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+//                // group by the tuple field "0" and sum up tuple field "1"
+//                .sum(1);
 
 
-        counts.print();
-        rejectedWords.print();
+//        counts.print();
+//        rejectedWords.print();
+
+        rejected3Words.print();
+        rejected5Words.print();
+        rejected7Words.print();
+
 
 
         // execute program
@@ -97,8 +120,12 @@ public class SideOutputExample {
 
             // emit the pairs
             for (String token : tokens) {
-                if (token.length() > 5) {
-                    ctx.output(rejectedWordsTag, token);
+                if (token.length() >= 3 && token.length()<5) {
+                    ctx.output(rejected3Tag, token);
+                } else if(token.length()>=5 && token.length()<7){
+                    ctx.output(rejected5Tag,token);
+                }else if(token.length()>7){
+                    ctx.output(rejected7Tag,token);
                 } else if (token.length() > 0) {
                     out.collect(new Tuple2<>(token, 1));
                 }

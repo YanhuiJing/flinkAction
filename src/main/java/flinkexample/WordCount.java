@@ -1,17 +1,27 @@
 package flinkexample;
 
 import flinkconnector.DefineSource;
+import flinkconnector.RollTimeBucketer;
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.runtime.state.memory.MemoryStateBackend;
+import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.connectors.fs.bucketing.BucketingSink;
 import org.apache.flink.streaming.connectors.fs.bucketing.DateTimeBucketer;
 import org.apache.flink.util.Collector;
+import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
 import utils.Words;
 
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * wordCount主类
@@ -99,24 +109,34 @@ public class WordCount {
         //创建流运行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        env.enableCheckpointing(600000L);
+        CheckpointConfig checkpointConfig = env.getCheckpointConfig();
+        //语义保证
+        checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
+        //checkpoint最小时间间隔
+        checkpointConfig.setMinPauseBetweenCheckpoints(30000L);
+        //checkpoint 超时时间
+        checkpointConfig.setCheckpointTimeout(10000L);
+
+        env.setStateBackend(new MemoryStateBackend());
+
 //        env.getConfig().setGlobalJobParameters(ParameterTool.fromArgs(args));
 
-        BucketingSink<String> bucketingSink = new BucketingSink<>("/Users/vivo/res");
+        BucketingSink<String> showSink = new BucketingSink<>("/Users/vivo/res");
+        // rollinterval滚动目录生成,rollinterval设置为5,则系统按照5分钟的时间间隔生成目录(00,05,10,15....55)
+        showSink.setBucketer(new RollTimeBucketer<>("yyyyMMdd/HH/mm",
+                ZoneId.of("Asia/Shanghai"), 5L, TimeUnit.MINUTES));
+        // 滚动生成文件,在同一个目录中如果生成文件满足一下任意一个条件(文件大小,文件时间间隔),则生成新的文件
+        showSink.setBatchSize(1024 * 1024 * 1); // 400 MB
+        showSink.setBatchRolloverInterval(1 * 60 * 1000); // 20 min
+
+        // 设置文件后缀
+//        showSink.setPartSuffix(".gzip");
 
 
         env.addSource(new DefineSource.LineSource())
-                .flatMap(new SplitFunction())
-                .addSink(bucketingSink);
-
-//                .addSink(new DateTimeBucketer<String>());
-
-
-//                .addSink();
-//                .addSink(new)
-//                .print();
-
-
-
+//                .flatMap(new SplitFunction())
+                .addSink(showSink);
 
         //Streaming 程序必须加这个才能启动程序，否则不会有结果
         env.execute("gavin —— word count streaming demo");

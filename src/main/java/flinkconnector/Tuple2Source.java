@@ -19,7 +19,10 @@ public class Tuple2Source implements SourceFunction<Tuple2<String,Integer>> {
     private List<Tuple2<String,Integer>> tupleList = Arrays.asList(
             Tuple2.of("a",1),
             Tuple2.of("b",2),
-            Tuple2.of("c",3)
+            Tuple2.of("c",3),
+            Tuple2.of("d",4),
+            Tuple2.of("e",5),
+            Tuple2.of("f",6)
     );
 
     private int count;

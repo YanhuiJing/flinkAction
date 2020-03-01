@@ -97,7 +97,6 @@ public class Launcher {
          * 读取kafka事件流
          */
         final FlinkKafkaConsumer010<UserEvent> kafkaUserEventSource = new FlinkKafkaConsumer010<UserEvent>(params.get(INPUT_EVENT_TOPIC), new UserEventDeserializationSchema(), consumerProps);
-//        final FlinkKafkaConsumer010<UserEvent> kafkaUserEventSource = new FlinkKafkaConsumer010<UserEvent>(params.get(INPUT_EVENT_TOPIC),  , consumerProps);
 
         KeyedStream<UserEvent, String> customerUserEventStream = env.addSource(kafkaUserEventSource)
                 .assignTimestampsAndWatermarks(new CustomWatermarkExtractor(org.apache.flink.streaming.api.windowing.time.Time.hours(24)))

@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 public class UserEvent implements Serializable {
 
-    private static final long serialVersionUID = -2764829572396479114L;
+    private static final long serialVersionUID = 7325727813196959203L;
     private String userId;
     private String channel;
     private String eventType;

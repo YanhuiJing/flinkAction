@@ -21,7 +21,7 @@ import utils.Words;
  * @author gavin
  * @createDate 2019/11/26
  */
-public class SideOutputExample {
+public class SideOutputAction {
 
     /**
      * We need to create an {@link OutputTag} so that we can reference it when emitting

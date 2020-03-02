@@ -25,6 +25,23 @@ public class CheckpointAction {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        // flink包含fixed-delay（固定延时重启策略）、failure-rate（故障率重启策略）、none（不重启策略）三种重启策略
+        // FixedDelayRestartStrategy 是固定延迟重启策略，程序按照集群配置文件中或者程序中额外设置的重启次数尝试重启作业，
+        // 如果尝试次数超过了给定的最大次数，程序还没有起来，则停止作业，另外还可以配置连续两次重启之间的等待时间
+        // env.setRestartStrategy(RestartStrategies.fixedDelayRestart(
+        //      3, // 尝试重启的次数
+        //      Time.of(10, TimeUnit.SECONDS) // 延时
+        //  ));
+
+        //  FailureRateRestartStrategy 是故障率重启策略，在发生故障之后重启作业，如果固定时间间隔之内发生故障的次数超过设置的值后，
+        //  作业就会失败停止，该重启策略也支持设置连续两次重启之间的等待时间。
+        //  env.setRestartStrategy(RestartStrategies.failureRateRestart(
+        //      3, // 固定时间间隔允许 Job 重启的最大次数
+        //      Time.of(5, TimeUnit.MINUTES), // 固定时间间隔
+        //      Time.of(10, TimeUnit.SECONDS) // 两次重启的延迟时间
+        //  ));
+
+
         // 开启 Checkpoint，每 1000毫秒进行一次 Checkpoint
         env.enableCheckpointing(1000);
 

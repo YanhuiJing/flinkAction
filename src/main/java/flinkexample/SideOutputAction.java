@@ -95,6 +95,10 @@ public class SideOutputAction {
 
 
 
+
+
+
+
         // execute program
         env.execute("Streaming Words SideOutput");
     }

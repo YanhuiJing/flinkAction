@@ -26,6 +26,20 @@ Flink 官网的定义是 Stateful Computations over Data Streams（数据流上�
 而计算 PV、UV 就属于有状态计算。实时计算 PV 时，每次都需要从某个存储介质的结果表中拿到之前的 PV 值，+1 后 set 到结果表中。
 有状态计算表示输出的结果跟之前的状态有关系，不符合幂等性，访问多次，PV 会增加。
 
+public Transformation(String name, TypeInformation<T> outputType, int parallelism) {
+    this.id = getNewNodeId();
+    this.name = Preconditions.checkNotNull(name); => 操作算子名称
+    this.outputType = outputType; => 操作算子输出类型
+    this.parallelism = parallelism; => 操作算子并行度
+    this.slotSharingGroup = null;
+}
+
+JobGraph是在StreamGraph的基础之上，对StreamNode进⾏行行了了关联合并的操作，
+⽐比如对于source -> flatMap -> reduce -> sink 这样⼀一个数据处理理链，当source和
+flatMap满⾜足链接的条件时，可以可以将两个操作符的操作放到⼀一个线程并⾏行行执⾏行行，
+这样可以减少⽹网络中的数据传输，由于在source和flatMap之间的传输的数据也不不⽤用
+序列列化和反序列列化，所以也提⾼高了了程序的执⾏行行效率
+
 
 
 

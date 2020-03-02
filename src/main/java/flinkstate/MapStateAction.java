@@ -3,6 +3,7 @@ package flinkstate;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -35,12 +36,12 @@ public class MapStateAction {
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
 
         executionEnvironment.fromElements(
-                Tuple2.of("a",1l),
-                Tuple2.of("a",2l),
-                Tuple2.of("a",3l),
-                Tuple2.of("b",2l),
-                Tuple2.of("b",2l),
-                Tuple2.of("b",2l)
+                Tuple2.of("a",1L),
+                Tuple2.of("a",2L),
+                Tuple2.of("a",3L),
+                Tuple2.of("b",2L),
+                Tuple2.of("b",2L),
+                Tuple2.of("b",2L)
         ).keyBy(0)
          .flatMap(new MapStateFunction())
          .print();

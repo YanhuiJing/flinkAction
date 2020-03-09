@@ -201,7 +201,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <!--注意：这里一定要换成你自己的 Job main 方法的启动类-->
-                                    <mainClass>flinkexample.WordCount</mainClass>
+                                    <mainClass>flinkexample.MapStateUVAction</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

@@ -79,24 +79,9 @@ public class SideOutputAction {
                     }
                 });
 
-//        DataStream<Tuple2<String, Integer>> counts = tokenized
-//                .keyBy(0)
-//                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
-//                // group by the tuple field "0" and sum up tuple field "1"
-//                .sum(1);
-
-
-//        counts.print();
-//        rejectedWords.print();
-
         rejected3Words.print();
         rejected5Words.print();
         rejected7Words.print();
-
-
-
-
-
 
 
         // execute program

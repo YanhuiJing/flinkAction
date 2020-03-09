@@ -40,6 +40,42 @@ flatMap满⾜足链接的条件时，可以可以将两个操作符的操作放�
 这样可以减少⽹网络中的数据传输，由于在source和flatMap之间的传输的数据也不不⽤用
 序列列化和反序列列化，所以也提⾼高了了程序的执⾏行行效率
 
+JobGraph是一个Job的用户逻辑视图表示，将一个用户要对数据流进行的处理表示为单个DAG图（对应于JobGraph），
+DAG图由顶点（JobVertex）和中间结果集（IntermediateDataSet）组成，其中JobVertex表示了对数据流进行的转换操作，
+比如map、flatMap、filter、keyBy等操作，而IntermediateDataSet是由上游的JobVertex所生成，同时作为下游的JobVertex的输入。
+而ExecutionGraph是JobGraph的并行表示，也就是实际JobManager调度一个Job在TaskManager上运行的逻辑视图，它也是一个DAG图，
+是由ExecutionJobVertex、IntermediateResult（或IntermediateResultPartition）组成，ExecutionJobVertex实际对应于
+JobGraph图中的JobVertex，只不过在ExecutionJobVertex内部是一种并行表示，由多个并行的ExecutionVertex所组成。另外，
+这里还有一个重要的概念，就是Execution，它是一个ExecutionVertex的一次运行Attempt，也就是说，一个ExecutionVertex可能对应
+多个运行状态的Execution，比如，一个ExecutionVertex运行产生了一个失败的Execution，然后还会创建一个新的Execution来运行，
+这时就对应这个2次运行Attempt。每个Execution通过ExecutionAttemptID来唯一标识，在TaskManager和JobManager之间进行Task状态
+的交换都是通过ExecutionAttemptID来实现的。
+
+
+class StreamingJobGraphGenerator
+// 判断两个StreamNode是否能chain在一起
+public static boolean isChainable(StreamEdge edge, StreamGraph streamGraph) {
+    StreamNode upStreamVertex = streamGraph.getSourceVertex(edge);
+    StreamNode downStreamVertex = streamGraph.getTargetVertex(edge);
+
+    StreamOperatorFactory<?> headOperator = upStreamVertex.getOperatorFactory();
+    StreamOperatorFactory<?> outOperator = downStreamVertex.getOperatorFactory();
+
+    下游Edges的长度为1 ||  上下游操作不为空  ||  上下游算子的共享槽相同  || 下游的chain策略是always而上游的策略是always或者head
+    edge的shuffle模式不是BATCH模式  ||  上下游的并行度数量相等  ||  streamGraph是可连接的
+    return downStreamVertex.getInEdges().size() == 1
+        && outOperator != null
+        && headOperator != null
+        && upStreamVertex.isSameSlotSharingGroup(downStreamVertex)
+        && outOperator.getChainingStrategy() == ChainingStrategy.ALWAYS
+        && (headOperator.getChainingStrategy() == ChainingStrategy.HEAD ||
+        headOperator.getChainingStrategy() == ChainingStrategy.ALWAYS)
+        && (edge.getPartitioner() instanceof ForwardPartitioner)
+        && edge.getShuffleMode() != ShuffleMode.BATCH
+        && upStreamVertex.getParallelism() == downStreamVertex.getParallelism()
+        && streamGraph.isChainingEnabled();
+}
+
 
 
 

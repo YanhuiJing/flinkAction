@@ -27,12 +27,12 @@ public class ValueStateAction {
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
 
         executionEnvironment.fromElements(
-                Tuple2.of("a",1l),
-                Tuple2.of("a",2l),
-                Tuple2.of("a",3l),
-                Tuple2.of("b",2l),
-                Tuple2.of("b",2l),
-                Tuple2.of("b",2l)
+                Tuple2.of("a",1L),
+                Tuple2.of("a",2L),
+                Tuple2.of("a",3L),
+                Tuple2.of("b",2L),
+                Tuple2.of("b",2L),
+                Tuple2.of("b",2L)
         ).keyBy(0)
          .flatMap(new ValueStateFunction())
          .print();
@@ -67,10 +67,6 @@ public class ValueStateAction {
         @Override
         public void open(Configuration parameters) throws Exception {
 
-//            ValueStateDescriptor valueStateDescriptor = new ValueStateDescriptor(
-//                    "valueState",
-//                    Long.class
-//            );
 
             ValueStateDescriptor valueStateDescriptor = new ValueStateDescriptor(
                     "valueState",
